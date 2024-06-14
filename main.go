@@ -6,18 +6,20 @@ import (
 
 	"github.com/Javokhdev/Auth-Service/api"
 	"github.com/Javokhdev/Auth-Service/api/handler"
-	pb "github.com/Javokhdev/Auth-Service/service"
-	"github.com/Javokhdev/Auth-Service/storage/postgres"
+	pb "github.com/Javokhdev/Auth-Service/genprotos"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
-	db, err := postgres.NewPostgresStorage()
+	UserConn, err := grpc.NewClient(fmt.Sprintf("localhost%s", ":8085"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
+		log.Fatal("Error while NEwclient: ", err.Error())
 	}
-	us := pb.NewUserService(db)
+	defer UserConn.Close()
 
-	h := handler.NewHandler(us)
+	skill := pb.NewUserServiceClient(UserConn)
+	h := handler.NewHandler(skill)
 	r := api.NewGin(h)
 
 	fmt.Println("Server started on port:8081")

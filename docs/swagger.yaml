@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   genprotos.GetAllUsers:
     properties:
@@ -17,69 +18,13 @@ definitions:
       username:
         type: string
     type: object
+host: localhost:8081
 info:
   contact: {}
+  description: API for Auth-Service
+  title: Auth-Service API
+  version: "1.0"
 paths:
-  /User/getbyid/{id}:
-    get:
-      consumes:
-      - application/json
-      description: GetById page
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: GetById Successful
-          schema:
-            $ref: '#/definitions/genprotos.Users'
-        "401":
-          description: Error while GetByIdd
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: GetById User
-      tags:
-      - User
-  /User/update/{id}:
-    put:
-      consumes:
-      - application/json
-      description: Update page
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Update
-        in: body
-        name: Update
-        required: true
-        schema:
-          $ref: '#/definitions/genprotos.Users'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Update Successful
-          schema:
-            type: string
-        "401":
-          description: Error while created
-          schema:
-            type: string
-      security:
-      - BearerAuth: []
-      summary: Update User
-      tags:
-      - User
   /user/delete/{id}:
     delete:
       consumes:
@@ -141,6 +86,33 @@ paths:
       summary: GetAll User
       tags:
       - User
+  /user/getbyid/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GetById page
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GetById Successful
+          schema:
+            $ref: '#/definitions/genprotos.Users'
+        "401":
+          description: Error while GetByIdd
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: GetById User
+      tags:
+      - User
   /user/login:
     post:
       consumes:
@@ -197,4 +169,42 @@ paths:
       summary: Create User
       tags:
       - User
+  /user/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update page
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update
+        in: body
+        name: Update
+        required: true
+        schema:
+          $ref: '#/definitions/genprotos.Users'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Update Successful
+          schema:
+            type: string
+        "401":
+          description: Error while created
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update User
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authourization
+    type: apiKey
 swagger: "2.0"

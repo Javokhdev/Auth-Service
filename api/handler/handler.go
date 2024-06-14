@@ -1,11 +1,11 @@
 package handler
 
-import pb "github.com/Javokhdev/Auth-Service/service"
+import pb "github.com/Javokhdev/Auth-Service/genprotos"
 
 type Handler struct {
-	User   *pb.UserService
+	User   pb.UserServiceClient
 }
 
-func NewHandler(us *pb.UserService) *Handler {
+func NewHandler(us pb.UserServiceClient) *Handler {
 	return &Handler{us}
 }

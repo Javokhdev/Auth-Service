@@ -44,9 +44,11 @@ func (h *Handler) RegisterUser(ctx *gin.Context){
 // @Param   		Update  body   pb.Users    true   "Update"
 // @Success 		200   {string} string    "Update Successful"
 // @Failure 		401   {string} string    "Error while created"
-// @Router 			/User/update/{id} [put]
+// @Router 			/user/update/{id} [put]
 func (h *Handler) UpdateUser(ctx *gin.Context){
 	arr:=pb.Users{}
+	id:=ctx.Param("id")
+	arr.Id=id
 	err:=ctx.BindJSON(&arr)
 	if err!=nil{
 		panic(err)
@@ -113,7 +115,7 @@ func (h *Handler) GetAllUser(ctx *gin.Context){
 // @Param     		id   path      string   true    "User ID"
 // @Success 		200 {object}   pb.Users  "GetById Successful"
 // @Failure 		401 {string}   string   "Error while GetByIdd"
-// @Router 			/User/getbyid/{id} [get]
+// @Router 			/user/getbyid/{id} [get]
 func (h *Handler) GetbyIdUser(ctx *gin.Context){
 	id:=pb.ById{Id: ctx.Param("id")}
 	res, err:=h.User.GetByIdUser(ctx, &id)

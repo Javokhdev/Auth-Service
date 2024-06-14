@@ -31,7 +31,7 @@ func (p *UsersStorage) CreateUser(user *pb.Users) (*pb.Void, error) {
 func (p *UsersStorage) GetByIdUser(id *pb.ById) (*pb.Users, error) {
 	query := `
 			SELECT username, email from users 
-			where id =$1 and delated_at=0
+			where id =$1 and deleted_at=0
 		`
 	row := p.db.QueryRow(query, id.Id)
 
@@ -52,7 +52,7 @@ func (p *UsersStorage) GetAllUser(us *pb.Users) (*pb.GetAllUsers, error) {
 	count:=1
 	
 	query:=` SELECT username, email from users 
-	where delated_at=0 `
+	where deleted_at=0 `
 	if len(us.Email) > 0 {
 		query += fmt.Sprintf(" and email=$%d", count)
 		count++
@@ -82,16 +82,16 @@ func (p *UsersStorage) GetAllUser(us *pb.Users) (*pb.GetAllUsers, error) {
 func (p *UsersStorage) UpdateUser(user *pb.Users) (*pb.Void, error) {
 	query := `
 		UPDATE users
-		SET username = $2, email = $3
-		WHERE id = $1 
+		SET username = $1, email = $2, password = $3
+		WHERE id = $4 
 	`
-	_, err := p.db.Exec(query, user.Id, user.Username, user.Email)
+	_, err := p.db.Exec(query, user.Username, user.Email, user.Password, user.Id)
 	return nil, err
 }
 
 func (p *UsersStorage) DeleteUser(id *pb.ById) (*pb.Void, error) {
 	query := `
-		update from users set delated_at=$2
+		update users set deleted_at=$2
 		where id = $1
 	`
 	_, err := p.db.Exec(query, id.Id, time.Now().Unix())
@@ -100,8 +100,8 @@ func (p *UsersStorage) DeleteUser(id *pb.ById) (*pb.Void, error) {
 
 func (p *UsersStorage) LoginUser(userName *pb.Users) (*pb.Users, error) {
 	query := `
-			SELECT user_name, email from users 
-			where user_name =$1 and delated_at=0
+			SELECT username, email from users 
+			where username =$1 and deleted_at=0
 		`
 	row := p.db.QueryRow(query, userName.Username)
 
