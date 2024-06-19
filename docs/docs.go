@@ -79,22 +79,20 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Email",
                         "name": "email",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "id",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "password",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
+                        "description": "Username",
                         "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Id",
+                        "name": "id",
                         "in": "query"
                     }
                 ],

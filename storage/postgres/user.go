@@ -59,9 +59,15 @@ func (p *UsersStorage) GetAllUser(us *pb.Users) (*pb.GetAllUsers, error) {
 		arr = append(arr, us.Email)
 	}
 	if len(us.Username) > 0 {
-		query += fmt.Sprintf(" and user_name=$%d", count)
+		query += fmt.Sprintf(" and username=$%d", count)
 		count++
 		arr = append(arr, us.Username)
+	}
+
+	if len(us.Id) > 0 {
+		query += fmt.Sprintf(" and id=$%d", count)
+		count++
+		arr = append(arr, us.Id)
 	}
 	row, err := p.db.Query(query, arr...)
 	if err != nil {

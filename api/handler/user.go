@@ -88,15 +88,17 @@ func (h *Handler) DeleteUser(ctx *gin.Context){
 // @Accept  		json
 // @Produce  		json
 // @Security  		BearerAuth
-// @Param 			query query pb.Users true    "Query parameter"
+// @Param 			email query string false    "Email"
+// @Param 			username query string false    "Username"
+// @Param 			id query string false "Id"
 // @Success 		200 {object}  pb.GetAllUsers  "GetAll Successful"
 // @Failure 		401 {string}  string  		  "Error while GetAll"
 // @Router 			/user/getall  [get]
 func (h *Handler) GetAllUser(ctx *gin.Context){
 	user := &pb.Users{}
-	user.Email = ctx.Param("email")
-	user.Password = ctx.Param("password")
-	user.Username = ctx.Param("username")
+	user.Id  = ctx.Query("id")
+	user.Email = ctx.Query("email")
+	user.Username = ctx.Query("username")
 
 	res, err:=h.User.GetAllUser(ctx, user)
 	if err!=nil{

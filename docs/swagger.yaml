@@ -58,17 +58,17 @@ paths:
       - application/json
       description: GetAll page
       parameters:
-      - in: query
+      - description: Email
+        in: query
         name: email
         type: string
-      - in: query
-        name: id
-        type: string
-      - in: query
-        name: password
-        type: string
-      - in: query
+      - description: Username
+        in: query
         name: username
+        type: string
+      - description: Id
+        in: query
+        name: id
         type: string
       produces:
       - application/json

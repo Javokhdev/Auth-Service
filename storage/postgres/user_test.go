@@ -1,99 +1,140 @@
-package postgres
+package postgres_test
 
 import (
-	"log"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	pb "github.com/Javokhdev/Auth-Service/genprotos"
-
+	"github.com/Javokhdev/Auth-Service/storage/postgres"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateUser(t *testing.T) {
-	stg, err := NewPostgresStorage()
-	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
-	}
-
-	users := &pb.Users{
-		Id:       "b409ff53-ff2b-4033-84b4-4ce555081647",
-		Username: "Javokh_dev",
-		Password: "Javohir_dev",
-		Email:    "javohdev@gmail.com",
-	}
-	result, err := stg.User().CreateUser(users)
-
+	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
+	defer db.Close()
+
+	storage := postgres.NewUsersStorage(db)
+
+	mock.ExpectExec("INSERT INTO users").WithArgs(sqlmock.AnyArg(), "username1", "email1@example.com", "password1").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	user := &pb.Users{
+		Username: "username1",
+		Email:    "email1@example.com",
+		Password: "password1",
+	}
+
+	_, err = storage.CreateUser(user)
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestGetByIdUser(t *testing.T) {
-	stg, err := NewPostgresStorage()
-	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
-	}
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
 
-	var Id pb.ById
+	storage := postgres.NewUsersStorage(db)
 
-	Id.Id = "b409ff53-ff2b-4033-84b4-4ce555081647"
+	rows := sqlmock.NewRows([]string{"username", "email"}).
+		AddRow("username1", "email1@example.com")
 
-	user, err := stg.User().GetByIdUser(&Id)
+	mock.ExpectQuery("SELECT username, email from users where id =").
+		WithArgs("1").
+		WillReturnRows(rows)
 
+	id := &pb.ById{Id: "1"}
+	user, err := storage.GetByIdUser(id)
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
+	assert.Equal(t, "username1", user.Username)
+	assert.Equal(t, "email1@example.com", user.Email)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestGetAllUser(t *testing.T) {
-	stg, err := NewPostgresStorage()
-	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
-	}
-	users, err := stg.User().GetAllUser(&pb.Users{})
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	storage := postgres.NewUsersStorage(db)
+
+	rows := sqlmock.NewRows([]string{"username", "email"}).
+		AddRow("username1", "email1@example.com").
+		AddRow("username2", "email2@example.com")
+
+	mock.ExpectQuery("SELECT username, email from users where deleted_at=0").
+		WillReturnRows(rows)
+
+	users, err := storage.GetAllUser(&pb.Users{})
 	assert.NoError(t, err)
 	assert.NotNil(t, users)
+	assert.Len(t, users.Users, 2)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestUpdateUser(t *testing.T) {
-	stg, err := NewPostgresStorage()
-	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
-	}
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	storage := postgres.NewUsersStorage(db)
+
+	mock.ExpectExec("UPDATE users SET username =").WithArgs("username1", "email1@example.com", "password1", "1").
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	user := &pb.Users{
-		Id:       "b409ff53-ff2b-4033-84b4-4ce555081647",
-		Username: "updated_Javokh_dev",
-		Email:    "updated_javohdev@gmail.com",
+		Id:       "1",
+		Username: "username1",
+		Email:    "email1@example.com",
+		Password: "password1",
 	}
-	result, err := stg.User().UpdateUser(user)
 
+	_, err = storage.UpdateUser(user)
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestDeleteUser(t *testing.T) {
-	stg, err := NewPostgresStorage()
-	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
-	}
-
-	var Id pb.ById
-
-	Id.Id = "b409ff53-ff2b-4033-84b4-4ce555081647"
-
-	result, err := stg.User().DeleteUser(&Id)
-
+	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
+	defer db.Close()
+
+	storage := postgres.NewUsersStorage(db)
+
+	mock.ExpectExec("update users set deleted_at=").WithArgs("1", sqlmock.AnyArg()).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+
+	id := &pb.ById{Id: "1"}
+
+	_, err = storage.DeleteUser(id)
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestLoginUser(t *testing.T) {
-	stg, err := NewPostgresStorage()
-	if err != nil {
-		log.Fatal("Error while connection on db: ", err.Error())
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	storage := postgres.NewUsersStorage(db)
+
+	rows := sqlmock.NewRows([]string{"username", "email"}).
+		AddRow("username1", "email1@example.com")
+
+	mock.ExpectQuery("SELECT username, email from users where username =").
+		WithArgs("username1").
+		WillReturnRows(rows)
+
+	user := &pb.Users{
+		Username: "username1",
 	}
 
-	user, err := stg.User().LoginUser(&pb.Users{})
-
+	loginUser, err := storage.LoginUser(user)
 	assert.NoError(t, err)
-	assert.NotNil(t, user)
+	assert.NotNil(t, loginUser)
+	assert.Equal(t, "username1", loginUser.Username)
+	assert.Equal(t, "email1@example.com", loginUser.Email)
+	assert.NoError(t, mock.ExpectationsWereMet())
 }

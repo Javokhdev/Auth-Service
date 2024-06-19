@@ -3,6 +3,7 @@ module github.com/Javokhdev/Auth-Service
 go 1.22.1
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
