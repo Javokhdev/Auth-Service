@@ -45,7 +45,7 @@ func (h *Handler) RegisterUser(ctx *gin.Context){
 // @Success 		200   {string} string    "Update Successful"
 // @Failure 		401   {string} string    "Error while created"
 // @Router 			/user/update/{id} [put]
-func (h *Handler) UpdateUser(ctx *gin.Context){
+func (h *Handler) UpdateUser(ctx *gin.Context) {
 	arr:=pb.Users{}
 	id:=ctx.Param("id")
 	arr.Id=id
